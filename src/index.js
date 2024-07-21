@@ -4,7 +4,7 @@ import ListaNotas from './ListaNotas';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <div className='container pt-3'>
+    <div className='flex justify-center pt-3'>
         <ListaNotas></ListaNotas>
     </div>
 );
