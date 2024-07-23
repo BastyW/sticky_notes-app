@@ -8,6 +8,7 @@ export default function ListaNotas() {
     const [isEditing, setIsEditing] = useState(false);
     const [editTitulo, setEditTitulo] = useState("");
     const [editDescripcion, setEditDescripcion] = useState("");
+    const [editError, setEditError] = useState({ titulo: "", descripcion: "" });
     const tituloRef = useRef();
     const descripcionRef = useRef();
     const importanteRef = useRef();
@@ -94,6 +95,29 @@ export default function ListaNotas() {
     };
 
     const handleSaveNota = () => {
+        let valid = true;
+        let newEditError = { titulo: "", descripcion: "" };
+
+        if (editDescripcion === "") {
+            newEditError.descripcion = "La descripción es obligatoria";
+            newEditError.titulo = " -";
+            valid = false;
+        }
+
+        if (editTitulo.length > 20) {
+            newEditError.titulo = "Máximo 20 caracteres";
+            valid = false;
+        }
+
+        if (editDescripcion.length > 200) {
+            newEditError.descripcion = "Máximo 200 caracteres";
+            valid = false;
+        }
+
+        setEditError(newEditError);
+
+        if (!valid) return;
+
         setNotas(prevNotas => prevNotas.map(nota => 
             nota.id === selectedNota.id ? { ...nota, titulo: editTitulo, descripcion: editDescripcion } : nota
         ));
@@ -119,7 +143,7 @@ export default function ListaNotas() {
                 </div>
                 <button onClick={agregarNota} className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 md:mt-0">Agregar</button>
             </div>
-            <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ${selectedNota ? 'blur-sm' : ''}`}>
+            <div className={`flex flex-wrap justify-center gap-4 ${selectedNota ? 'blur-sm' : ''}`}>
                 {notas.map((item) => (
                     <ItemNota key={item.id} nota={item} onSelect={handleSelectNota}></ItemNota>
                 ))}
@@ -136,19 +160,22 @@ export default function ListaNotas() {
                                     onChange={(e) => setEditTitulo(e.target.value)} 
                                     placeholder="Título" 
                                 />
+                                {editError.titulo && <div className="text-red-500 mt-1">{editError.titulo}</div>}
                                 <textarea 
                                     className="form-input w-full p-2 border border-gray-300 text-black rounded-md" 
                                     value={editDescripcion} 
                                     onChange={(e) => setEditDescripcion(e.target.value)} 
                                     placeholder="Descripción" 
+                                    style={{ wordBreak: "break-word", wordWrap: "break-word" }}
                                 />
+                                {editError.descripcion && <div className="text-red-500 mt-1">{editError.descripcion}</div>}
                                 <div className="flex justify-between items-center mt-4">
                                     <button onClick={handleSaveNota} className="bg-blue-500 text-white px-4 py-2 rounded-md">Guardar</button>
                                     <button onClick={handleCloseModal} className="bg-gray-500 text-white px-4 py-2 rounded-md">Cancelar</button>
                                 </div>
                             </div>
                         ) : (
-                            <div>
+                            <div style={{ wordBreak: "break-word", wordWrap: "break-word" }}>
                                 <div className="flex justify-between items-center mb-2">
                                     <h3 className="font-bold text-lg">{selectedNota.titulo}</h3>
                                     <div>
