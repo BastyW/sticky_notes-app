@@ -45,8 +45,8 @@ export default function ListaNotas() {
             valid = false;
         }
 
-        if (descripcion.length > 200) {
-            newError.descripcion = "Máximo 200 caracteres";
+        if (descripcion.length > 150) {
+            newError.descripcion = "Máximo 150 caracteres";
             valid = false;
         }
 
@@ -54,7 +54,7 @@ export default function ListaNotas() {
 
         if (!valid) return;
 
-        const rotacion = Math.floor(Math.random() * 21) - 10; // Generar inclinación aleatoria entre -10 y 10 grados
+        const rotacion = Math.floor(Math.random() * 11) - 5; // Generar inclinación aleatoria entre -10 y 10 grados
         const nuevaNota = {
             id: uuid(),
             titulo: titulo,
@@ -109,8 +109,8 @@ export default function ListaNotas() {
             valid = false;
         }
 
-        if (editDescripcion.length > 200) {
-            newEditError.descripcion = "Máximo 200 caracteres";
+        if (editDescripcion.length > 150) {
+            newEditError.descripcion = "Máximo 150 caracteres";
             valid = false;
         }
 
