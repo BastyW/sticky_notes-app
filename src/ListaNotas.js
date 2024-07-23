@@ -4,6 +4,10 @@ import { v4 as uuid } from 'uuid';
 
 export default function ListaNotas() {
     const [notas, setNotas] = useState([]);
+    const [selectedNota, setSelectedNota] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitulo, setEditTitulo] = useState("");
+    const [editDescripcion, setEditDescripcion] = useState("");
     const tituloRef = useRef();
     const descripcionRef = useRef();
     const importanteRef = useRef();
@@ -68,8 +72,37 @@ export default function ListaNotas() {
         setError({ titulo: "", descripcion: "" }); // Limpiar mensajes de error
     };
 
+    const handleSelectNota = (nota) => {
+        setSelectedNota(nota);
+        setEditTitulo(nota.titulo);
+        setEditDescripcion(nota.descripcion);
+        setIsEditing(false);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedNota(null);
+        setIsEditing(false);
+    };
+
+    const handleDeleteNota = () => {
+        setNotas(prevNotas => prevNotas.filter(nota => nota.id !== selectedNota.id));
+        handleCloseModal();
+    };
+
+    const handleEditNota = () => {
+        setIsEditing(true);
+    };
+
+    const handleSaveNota = () => {
+        setNotas(prevNotas => prevNotas.map(nota => 
+            nota.id === selectedNota.id ? { ...nota, titulo: editTitulo, descripcion: editDescripcion } : nota
+        ));
+        setIsEditing(false);
+        handleCloseModal();
+    };
+
     return (
-        <div className="max-w-7xl mx-auto p-4">
+        <div className="relative max-w-7xl mx-auto p-4">
             <h2 className="text-2xl text-white font-semibold mb-4 text-center">Listado de notas</h2>
             <div className="flex flex-col md:flex-row items-center justify-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
                 <div className="w-full max-w-xs">
@@ -86,11 +119,50 @@ export default function ListaNotas() {
                 </div>
                 <button onClick={agregarNota} className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 md:mt-0">Agregar</button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-items-center">
+            <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ${selectedNota ? 'blur-sm' : ''}`}>
                 {notas.map((item) => (
-                    <ItemNota key={item.id} nota={item}></ItemNota>
+                    <ItemNota key={item.id} nota={item} onSelect={handleSelectNota}></ItemNota>
                 ))}
             </div>
+            {selectedNota && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="fixed inset-0 bg-black opacity-50" onClick={handleCloseModal}></div>
+                    <div className={`relative p-4 rounded-lg shadow-lg z-50 max-w-lg w-full bg-${selectedNota.importante ? 'red-400' : 'yellow-200'} text-${selectedNota.importante ? 'white' : 'gray-800'}`}>
+                        {isEditing ? (
+                            <div>
+                                <input 
+                                    className="form-input w-full mb-2 p-2 border border-gray-300 text-black rounded-md" 
+                                    value={editTitulo} 
+                                    onChange={(e) => setEditTitulo(e.target.value)} 
+                                    placeholder="Título" 
+                                />
+                                <textarea 
+                                    className="form-input w-full p-2 border border-gray-300 text-black rounded-md" 
+                                    value={editDescripcion} 
+                                    onChange={(e) => setEditDescripcion(e.target.value)} 
+                                    placeholder="Descripción" 
+                                />
+                                <div className="flex justify-between items-center mt-4">
+                                    <button onClick={handleSaveNota} className="bg-blue-500 text-white px-4 py-2 rounded-md">Guardar</button>
+                                    <button onClick={handleCloseModal} className="bg-gray-500 text-white px-4 py-2 rounded-md">Cancelar</button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <h3 className="font-bold text-lg">{selectedNota.titulo}</h3>
+                                    <div>
+                                        <button onClick={handleEditNota} className="bg-yellow-500 text-white px-4 py-2 rounded-md mr-2">Editar</button>
+                                        <button onClick={handleDeleteNota} className="bg-red-500 text-white px-4 py-2 rounded-md">Eliminar</button>
+                                    </div>
+                                </div>
+                                <p>{selectedNota.descripcion}</p>
+                                <button onClick={handleCloseModal} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Cerrar</button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
