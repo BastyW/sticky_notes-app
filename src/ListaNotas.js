@@ -7,7 +7,7 @@ export default function ListaNotas() {
     const tituloRef = useRef();
     const descripcionRef = useRef();
     const importanteRef = useRef();
-    const [error, setError] = useState("");
+    const [error, setError] = useState({ titulo: "", descripcion: "" });
 
     useEffect(() => {
         const ListaNotas = JSON.parse(localStorage.getItem("sticky_notes-app-lista"));
@@ -22,20 +22,40 @@ export default function ListaNotas() {
     }, [notas]);
 
     const agregarNota = () => {
-        const titulo = tituloRef.current.value;
-        const descripcion = descripcionRef.current.value;
+        const titulo = tituloRef.current.value.trim();
+        const descripcion = descripcionRef.current.value.trim();
         const importante = importanteRef.current.checked;
 
+        let valid = true;
+        let newError = { titulo: "", descripcion: "" };
+
         if (descripcion === "") {
-            setError("La descripción es obligatoria");
-            return;
+            newError.descripcion = "La descripción es obligatoria";
+            newError.titulo = " -";
+            valid = false;
         }
 
+        if (titulo.length > 20) {
+            newError.titulo = "Máximo 20 caracteres";
+            valid = false;
+        }
+
+        if (descripcion.length > 200) {
+            newError.descripcion = "Máximo 200 caracteres";
+            valid = false;
+        }
+
+        setError(newError);
+
+        if (!valid) return;
+
+        const rotacion = Math.floor(Math.random() * 21) - 10; // Generar inclinación aleatoria entre -10 y 10 grados
         const nuevaNota = {
             id: uuid(),
             titulo: titulo,
             descripcion: descripcion,
-            importante: importante
+            importante: importante,
+            rotacion: rotacion
         };
 
         setNotas((prev) => {
@@ -45,22 +65,27 @@ export default function ListaNotas() {
         tituloRef.current.value = "";
         descripcionRef.current.value = "";
         importanteRef.current.checked = false;
-        setError(""); // Limpiar mensaje de erro
+        setError({ titulo: "", descripcion: "" }); // Limpiar mensajes de error
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-4">
-            <h2 className="text-2xl font-semibold mb-4 text-center">Listado de notas</h2>
-            <div className="flex items-center justify-center mb-4 space-x-2">
-                <input ref={tituloRef} className="form-input w-full max-w-xs p-2 border border-gray-300 rounded-md" placeholder="Título"></input>
-                <input ref={descripcionRef} className="form-input w-full max-w-xs p-2 border border-gray-300 rounded-md mx-2" placeholder="Descripción"></input>
+        <div className="max-w-7xl mx-auto p-4">
+            <h2 className="text-2xl text-white font-semibold mb-4 text-center">Listado de notas</h2>
+            <div className="flex flex-col md:flex-row items-center justify-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
+                <div className="w-full max-w-xs">
+                    <input ref={tituloRef} className="form-input w-full p-2 border border-gray-300 rounded-md" placeholder="Título"></input>
+                    {error.titulo && <div className="text-red-500 mt-1">{error.titulo}</div>}
+                </div>
+                <div className="w-full max-w-xs">
+                    <input ref={descripcionRef} className="form-input w-full p-2 border border-gray-300 rounded-md" placeholder="Descripción"></input>
+                    {error.descripcion && <div className="text-red-500 mt-1">{error.descripcion}</div>}
+                </div>
                 <div className="flex items-center">
                     <input ref={importanteRef} type="checkbox" className="form-checkbox text-indigo-600" id="importanteCheck"></input>
-                    <label className="ml-2 text-gray-700" htmlFor="importanteCheck">Importante</label>
+                    <label className="ml-2 text-white" htmlFor="importanteCheck">Importante</label>
                 </div>
-                <button onClick={agregarNota} className="bg-blue-500 text-white px-4 py-2 rounded-md mx-2">Agregar</button>
+                <button onClick={agregarNota} className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 md:mt-0">Agregar</button>
             </div>
-            {error && <div className="text-red-500 mb-4 text-center">{error}</div>}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-items-center">
                 {notas.map((item) => (
                     <ItemNota key={item.id} nota={item}></ItemNota>
