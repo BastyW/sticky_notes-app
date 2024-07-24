@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import ItemNota from "./ItemNota";
 import { v4 as uuid } from 'uuid';
+import deleteImage from './images/delete-image.png';
+import editImage from './images/edit-image.png';
 
 export default function ListaNotas() {
     const [notas, setNotas] = useState([]);
@@ -178,9 +180,9 @@ export default function ListaNotas() {
                             <div style={{ wordBreak: "break-word", wordWrap: "break-word" }}>
                                 <div className="flex justify-between items-center mb-2">
                                     <h3 className="font-bold text-lg">{selectedNota.titulo}</h3>
-                                    <div>
-                                        <button onClick={handleEditNota} className="bg-yellow-500 text-white px-4 py-2 rounded-md mr-2">Editar</button>
-                                        <button onClick={handleDeleteNota} className="bg-red-500 text-white px-4 py-2 rounded-md">Eliminar</button>
+                                    <div className="flex">
+                                        <img src={editImage} alt="Editar" onClick={handleEditNota} className="w-6 h-6 cursor-pointer mr-2"/>
+                                        <img src={deleteImage} alt="Eliminar" onClick={handleDeleteNota} className="w-6 h-6 cursor-pointer"/>
                                     </div>
                                 </div>
                                 <p>{selectedNota.descripcion}</p>
