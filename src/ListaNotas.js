@@ -47,11 +47,13 @@ export default function ListaNotas() {
 
         if (titulo.length > 20) {
             newError.titulo = "Máximo 20 caracteres";
+            newError.descripcion = " -";
             valid = false;
         }
 
         if (descripcion.length > 150) {
             newError.descripcion = "Máximo 150 caracteres";
+            newError.titulo = " -";
             valid = false;
         }
 
