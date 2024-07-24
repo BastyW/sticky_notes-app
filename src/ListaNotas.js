@@ -5,9 +5,9 @@ import deleteImage from './images/delete-image.png';
 import editImage from './images/edit-image.png';
 
 export default function ListaNotas() {
-    const [notas, setNotas] = useState([]);
-    const [selectedNota, setSelectedNota] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
+    const [notas, setNotas] = useState([]); // Para almacenar las notas
+    const [selectedNota, setSelectedNota] = useState(null); // Para la seelcción de notas
+    const [isEditing, setIsEditing] = useState(false); // Para controlar si se esta editando una nota
     const [editTitulo, setEditTitulo] = useState("");
     const [editDescripcion, setEditDescripcion] = useState("");
     const [editError, setEditError] = useState({ titulo: "", descripcion: "" });
@@ -15,7 +15,8 @@ export default function ListaNotas() {
     const descripcionRef = useRef();
     const importanteRef = useRef();
     const [error, setError] = useState({ titulo: "", descripcion: "" });
-
+    
+    // useEffect para cargar las notas desde localStorage al cargar el componente
     useEffect(() => {
         const ListaNotas = JSON.parse(localStorage.getItem("sticky_notes-app-lista"));
         if (ListaNotas) {
@@ -23,11 +24,13 @@ export default function ListaNotas() {
         }
     }, []);
 
+    // useEffect para guardar las notas en localStorage cada vez que cambia el estado de notas
     useEffect(() => {
         const json = JSON.stringify(notas);
         localStorage.setItem("sticky_notes-app-lista", json);
     }, [notas]);
 
+    // Función para agregar notas
     const agregarNota = () => {
         const titulo = tituloRef.current.value.trim();
         const descripcion = descripcionRef.current.value.trim();
@@ -56,7 +59,7 @@ export default function ListaNotas() {
 
         if (!valid) return;
 
-        const rotacion = Math.floor(Math.random() * 11) - 5; // Generar inclinación aleatoria entre -10 y 10 grados
+        const rotacion = Math.floor(Math.random() * 11) - 5; // Generar inclinación aleatoria entre -5 y 5 grados
         const nuevaNota = {
             id: uuid(),
             titulo: titulo,
@@ -75,6 +78,7 @@ export default function ListaNotas() {
         setError({ titulo: "", descripcion: "" }); // Limpiar mensajes de error
     };
 
+    // Función para seleccionar una nota para editar o ver detalles
     const handleSelectNota = (nota) => {
         setSelectedNota(nota);
         setEditTitulo(nota.titulo);
@@ -96,6 +100,7 @@ export default function ListaNotas() {
         setIsEditing(true);
     };
 
+    // Función para guardar los cambios realizados en la nota editada
     const handleSaveNota = () => {
         let valid = true;
         let newEditError = { titulo: "", descripcion: "" };
@@ -120,6 +125,7 @@ export default function ListaNotas() {
 
         if (!valid) return;
 
+        // Actualiza el estado de notas con la nota editada
         setNotas(prevNotas => prevNotas.map(nota => 
             nota.id === selectedNota.id ? { ...nota, titulo: editTitulo, descripcion: editDescripcion } : nota
         ));
